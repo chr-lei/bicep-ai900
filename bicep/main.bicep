@@ -1,19 +1,22 @@
 // Define parameters
 
-param resourceGroupLocation string = resourceGroup().location
+@description('Location for the learning resource group and all child resources.')
+param resourceGroupLocation string = 'eastus'
 
-@description('Identifier string for naming resources uniquely. Will be used as a prefix/suffix in resource names as appropriate.')
-param uniqueName string
+@description('Identifier string for naming resources uniquely. Will be used as a prefix/suffix in resource names as appropriate. 6 - 13')
+@minLength(3)
+@maxLength(10)
+param identifier string
 
 // Define variables
-var amlw_resource_name_seed = '${uniqueName}${uniqueString(resourceGroup().id, 'amlw')}'
+var resource_name_seed = '${identifier}${uniqueString(subscription().id, 'amlw')}'
 
 // Create Resources
 //
 // Storage Accounts for:
 // AI Search
 resource storageAccountSearch 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: '${uniqueName}search'
+  name: '${identifier}search'
   location: resourceGroupLocation
   sku: { name: 'Standard_LRS' }
   kind: 'StorageV2'
@@ -23,7 +26,7 @@ resource storageAccountSearch 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 // AI Services:
 // Search
 resource serviceSearch 'Microsoft.Search/searchServices@2020-08-01' = {
-  name: '${uniqueName}search'
+  name: '${identifier}search'
   location: resourceGroupLocation
   sku: { name: 'free' }
   properties: { 
@@ -33,19 +36,19 @@ resource serviceSearch 'Microsoft.Search/searchServices@2020-08-01' = {
 
 // Azure AI Services multi-service account
 resource serviceAIServices 'Microsoft.CognitiveServices/accounts@2021-04-30' = {
-  name: '${uniqueName}aiservice01'
+  name: '${identifier}aiservice01'
   location: resourceGroupLocation
   sku: { name: 'S0' }
   kind: 'CognitiveServices'
   properties: {
-    customSubDomainName: '${uniqueName}aiservice01'
+    customSubDomainName: '${identifier}aiservice01'
     publicNetworkAccess: 'Enabled'
   }
 }
 
 // Azure AI Language service
 resource serviceAILanguage 'Microsoft.CognitiveServices/accounts@2021-04-30' = {
-  name: '${uniqueName}language01'
+  name: '${identifier}language01'
   location: resourceGroupLocation
   sku: { name: 'F0' }
   kind: 'TextAnalytics'
@@ -53,7 +56,7 @@ resource serviceAILanguage 'Microsoft.CognitiveServices/accounts@2021-04-30' = {
     apiProperties: {
       qnaAzureSearchEndpointId: serviceSearch.id
     }
-    customSubDomainName: '${uniqueName}language01'
+    customSubDomainName: '${identifier}language01'
     publicNetworkAccess: 'Enabled'
   }
   identity: {
@@ -63,12 +66,12 @@ resource serviceAILanguage 'Microsoft.CognitiveServices/accounts@2021-04-30' = {
 
 // Azure Document Intelligence
 resource serviceDocumentIntelligence 'Microsoft.CognitiveServices/accounts@2021-04-30' = {
-  name: '${uniqueName}doc01'
+  name: '${identifier}doc01'
   location: resourceGroupLocation
   sku: { name: 'F0' }
   kind: 'FormRecognizer'
   properties: {
-    customSubDomainName: '${uniqueName}doc01'
+    customSubDomainName: '${identifier}doc01'
     publicNetworkAccess: 'Enabled'
   }
 }
@@ -76,7 +79,7 @@ resource serviceDocumentIntelligence 'Microsoft.CognitiveServices/accounts@2021-
 // Azure Machine Learning Workspace Resources
 // Storage Account
 resource amlw_storage 'Microsoft.Storage/storageAccounts@2019-06-01' = {
-  name: amlw_resource_name_seed
+  name: resource_name_seed
   location: resourceGroupLocation
   sku: { name: 'Standard_LRS' }
   kind: 'StorageV2'
@@ -98,7 +101,7 @@ resource amlw_storage 'Microsoft.Storage/storageAccounts@2019-06-01' = {
 
 // Key Vault
 resource amlw_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = {
-  name: amlw_resource_name_seed
+  name: resource_name_seed
   location: resourceGroupLocation
   properties: {
     sku: {
@@ -136,7 +139,7 @@ resource amlw_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = {
 
 // Application Insights
 resource amlw_app_insights 'Microsoft.Insights/components@2020-02-02-preview' = {
-  name: amlw_resource_name_seed
+  name: resource_name_seed
   location: resourceGroupLocation
   kind: 'web'
   properties: {
@@ -146,13 +149,13 @@ resource amlw_app_insights 'Microsoft.Insights/components@2020-02-02-preview' = 
 
 // Workspace
 resource amlw_workspace 'Microsoft.MachineLearningServices/workspaces@2020-08-01' = {
-  name: '${uniqueName}aml01'
+  name: '${identifier}aml01'
   location: resourceGroupLocation
   identity: {
     type: 'SystemAssigned'
   }
   properties: {
-    friendlyName: '${uniqueName}aml01'
+    friendlyName: '${identifier}aml01'
     storageAccount: amlw_storage.id
     keyVault: amlw_key_vault.id
     applicationInsights: amlw_app_insights.id
@@ -160,4 +163,4 @@ resource amlw_workspace 'Microsoft.MachineLearningServices/workspaces@2020-08-01
 }
 
 // Outputs
-output amlw_resource_name_seed string = amlw_resource_name_seed
+output resource_name_seed string = resource_name_seed
