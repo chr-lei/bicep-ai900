@@ -43,91 +43,17 @@ module AIServices 'aiservices.bicep' = {
   }
 }
 
-// // Azure Machine Learning Workspace Resources
-// // Storage Account
-// resource amlw_storage 'Microsoft.Storage/storageAccounts@2019-06-01' = {
-//   name: resource_name_seed
-//   location: resourceGroupLocation
-//   sku: { name: 'Standard_LRS' }
-//   kind: 'StorageV2'
-//   properties: {
-//     encryption: {
-//       services: {
-//         blob: {
-//           enabled: true
-//         }
-//         file: {
-//           enabled: true
-//         }
-//       }
-//       keySource: 'Microsoft.Storage'
-//     }
-//     supportsHttpsTrafficOnly: true
-//   }
-// }
-
-// // Key Vault
-// resource amlw_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = {
-//   name: resource_name_seed
-//   location: resourceGroupLocation
-//   properties: {
-//     sku: {
-//       name: 'standard'
-//       family: 'A'
-//     }
-//     tenantId: subscription().tenantId
-//     accessPolicies: []
-//   }
-
-//   resource amlw_key_vault_policy 'accessPolicies' = {
-//     name: 'replace'
-//     properties: {
-//       accessPolicies: [
-//         {
-//           tenantId: subscription().tenantId
-//           objectId: amlw_workspace.identity.principalId
-//           permissions: {
-//             keys: [
-//               'all'
-//             ]
-//             secrets: [
-//               'all'
-//             ]
-//             certificates: [
-//               'all'
-//             ]
-//             storage: []
-//           }
-//         }
-//       ]
-//     }
-//   }
-// }
-
-// // Application Insights
-// resource amlw_app_insights 'Microsoft.Insights/components@2020-02-02-preview' = {
-//   name: resource_name_seed
-//   location: resourceGroupLocation
-//   kind: 'web'
-//   properties: {
-//     Application_Type: 'web'
-//   }
-// }
-
-// // Workspace
-// resource amlw_workspace 'Microsoft.MachineLearningServices/workspaces@2020-08-01' = {
-//   name: '${nameString}aml01'
-//   location: resourceGroupLocation
-//   identity: {
-//     type: 'SystemAssigned'
-//   }
-//   properties: {
-//     friendlyName: '${nameString}aml01'
-//     storageAccount: amlw_storage.id
-//     keyVault: amlw_key_vault.id
-//     applicationInsights: amlw_app_insights.id
-//   }
-// }
+// Azure Machine Learning Workspace Resources
+module azureMachineLearningWorkspace 'mlworkspace.bicep' = {
+  name: '${resource_name_seed}-amlwDeploy'
+  scope: resourceGroup
+  params: {
+    nameSeed: resource_name_seed
+    location: resourceGroup.location
+    tenantId: tenant().tenantId
+  }
+}
 
 // Outputs
 output resource_name_seed string = resource_name_seed
+output azure_machine_learning_workspace_url string = azureMachineLearningWorkspace.outputs.amlw_url
