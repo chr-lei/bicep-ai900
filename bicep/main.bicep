@@ -106,6 +106,7 @@ resource amlw_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = {
       family: 'A'
     }
     tenantId: subscription().tenantId
+    accessPolicies: []
   }
 }
 
