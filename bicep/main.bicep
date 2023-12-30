@@ -108,6 +108,30 @@ resource amlw_key_vault 'Microsoft.KeyVault/vaults@2019-09-01' = {
     tenantId: subscription().tenantId
     accessPolicies: []
   }
+
+  resource amlw_key_vault_policy 'accessPolicies' = {
+    name: 'replace'
+    properties: {
+      accessPolicies: [
+        {
+          tenantId: subscription().tenantId
+          objectId: amlw_workspace.identity.principalId
+          permissions: {
+            keys: [
+              'all'
+            ]
+            secrets: [
+              'all'
+            ]
+            certificates: [
+              'all'
+            ]
+            storage: []
+          }
+        }
+      ]
+    }
+  }
 }
 
 // Application Insights
@@ -132,32 +156,6 @@ resource amlw_workspace 'Microsoft.MachineLearningServices/workspaces@2020-08-01
     storageAccount: amlw_storage.id
     keyVault: amlw_key_vault.id
     applicationInsights: amlw_app_insights.id
-  }
-}
-
-// Key Vault Access Policy
-resource amlw_key_vault_policy 'Microsoft.KeyVault/vaults/accessPolicies@2023-07-01' = {
-  parent: amlw_key_vault
-  name: 'replace'
-  properties: {
-    accessPolicies: [
-      {
-        tenantId: subscription().tenantId
-        objectId: amlw_workspace.identity.principalId
-        permissions: {
-          keys: [
-            'all'
-          ]
-          secrets: [
-            'all'
-          ]
-          certificates: [
-            'all'
-          ]
-          storage: []
-        }
-      }
-    ]
   }
 }
 
