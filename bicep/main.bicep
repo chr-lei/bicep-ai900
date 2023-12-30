@@ -6,17 +6,17 @@ targetScope = 'subscription'
 @description('Location for the learning resource group and all child resources.')
 param resourceGroupLocation string = 'eastus'
 
-@description('Identifier string for naming resources uniquely. Will be used as a prefix/suffix in resource names as appropriate. 6 - 13')
+@description('Name string for naming resources uniquely. Will be used as a prefix/suffix in resource names as appropriate. 6 - 13')
 @minLength(3)
 @maxLength(10)
-param identifier string
+param nameString string
 
 // Define variables
-var resource_name_seed = '${identifier}${uniqueString(subscription().id, resourceGroup.id, 'amlw')}'
+var resource_name_seed = '${nameString}${take(uniqueString(subscription().id, resourceGroup.id, 'amlw'), 6)}'
 
 // Create a resource group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'rg-${identifier}'
+  name: 'rg-${nameString}'
   location: resourceGroupLocation
 }
 
@@ -24,7 +24,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 //
 // AI Search
 module AISearch 'search.bicep' = {
-  name: '${identifier}-${resource_name_seed}-search'
+  name: '${resource_name_seed}-searchDeploy'
   scope: resourceGroup
   params: {
     nameSeed: resource_name_seed
@@ -34,7 +34,7 @@ module AISearch 'search.bicep' = {
 
 // AI Services
 module AIServices 'aiservices.bicep' = {
-  name: '${identifier}-${resource_name_seed}-services'
+  name: '${resource_name_seed}-servicesDeploy'
   scope: resourceGroup
   params: {
     nameSeed: resource_name_seed
@@ -116,13 +116,13 @@ module AIServices 'aiservices.bicep' = {
 
 // // Workspace
 // resource amlw_workspace 'Microsoft.MachineLearningServices/workspaces@2020-08-01' = {
-//   name: '${identifier}aml01'
+//   name: '${nameString}aml01'
 //   location: resourceGroupLocation
 //   identity: {
 //     type: 'SystemAssigned'
 //   }
 //   properties: {
-//     friendlyName: '${identifier}aml01'
+//     friendlyName: '${nameString}aml01'
 //     storageAccount: amlw_storage.id
 //     keyVault: amlw_key_vault.id
 //     applicationInsights: amlw_app_insights.id
