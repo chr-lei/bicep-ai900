@@ -33,6 +33,7 @@ resource serviceAIServices 'Microsoft.CognitiveServices/accounts@2021-04-30' = {
   name: '${uniqueName}aiservice01'
   location: resourceGroupLocation
   sku: { name: 'S0' }
+  kind: 'CognitiveServices'
 }
 
 // Azure AI Language service
