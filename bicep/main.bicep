@@ -160,3 +160,6 @@ resource amlw_key_vault_policy 'Microsoft.KeyVault/vaults/accessPolicies@2023-07
     ]
   }
 }
+
+// Outputs
+output amlw_resource_name_seed string = amlw_resource_name_seed
