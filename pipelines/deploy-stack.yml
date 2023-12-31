@@ -34,7 +34,7 @@ resources:
   - repository: bicep-ai900
     type: github
     endpoint: chr-lei
-    name: cleidich/bicep-ai900
+    name: chr-lei/bicep-ai900
 
 steps:
   - task: AzureCLI@2
