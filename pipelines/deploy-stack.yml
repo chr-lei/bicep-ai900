@@ -31,6 +31,7 @@ variables:
 
 steps:
   - task: AzureCLI@2
+    displayName: Deploy Stack
     inputs:
       azureSubscription: $(serviceConnection)
       scriptType: bash
