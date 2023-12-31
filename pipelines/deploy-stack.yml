@@ -9,7 +9,7 @@ trigger:
 name: Deploy Bicep Stack
 
 pool:
-  image: 'ubuntu-latest'
+  vmImage: 'ubuntu-latest'
 
 parameters:
 - name: stackName
