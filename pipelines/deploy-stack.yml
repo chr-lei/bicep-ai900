@@ -29,13 +29,6 @@ variables:
   resourceGroupLocation: ${{ parameters.location }}
   templateFile: 'bicep/main.bicep'
 
-resources:
-  repositories:
-  - repository: bicep-ai900
-    type: github
-    endpoint: chr-lei
-    name: chr-lei/bicep-ai900
-
 steps:
   - task: AzureCLI@2
     inputs:
