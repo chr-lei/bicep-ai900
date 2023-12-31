@@ -1,0 +1,49 @@
+trigger:
+  branches:
+    include:
+      main
+  paths:
+    include:
+      bicep/*.bicep
+
+name: Deploy Bicep Stack
+
+pool:
+  image: 'ubuntu-latest'
+
+parameters:
+- name: stackName
+  displayName: Stack Name
+  default: myStack
+- name: nameString
+  displayName: Name String
+  default: myai900
+- name: location
+  displayName: Resource Location
+  default: eastus
+  values:
+    eastus
+
+variables:
+  serviceConnection:
+  resourceGroupLocation: {{ parameters.location }}
+  templateFile: 'bicep/main.bicep'
+
+resources:
+  repositories:
+  - repository: bicep-ai900
+    type: github
+    endpoint: chr-lei
+    name: cleidich/bicep-ai900
+
+steps:
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: $(serviceConnection)
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az stack sub create -f $(templateFile) \
+          --location $(resourceGroupLocation) --name ${{ parameters.stackName }} \
+          --delete-all --deny-settings-mode none \
+          -p nameString=${{ parameters.nameString }} resourceGroupLocation=$(resourceGroupLocation)
