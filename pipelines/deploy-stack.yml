@@ -25,7 +25,7 @@ parameters:
     eastus
 
 variables:
-  serviceConnection:
+  serviceConnection: 'devops-bicep-ai900-service-connection'
   resourceGroupLocation: {{ parameters.location }}
   templateFile: 'bicep/main.bicep'
 
