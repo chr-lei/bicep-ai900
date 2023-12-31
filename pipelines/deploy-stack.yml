@@ -1,10 +1,10 @@
 trigger:
   branches:
     include:
-      main
+    - main
   paths:
     include:
-      bicep/*.bicep
+    - bicep/*.bicep
 
 name: Deploy Bicep Stack
 
@@ -22,11 +22,11 @@ parameters:
   displayName: Resource Location
   default: eastus
   values:
-    eastus
+  - eastus
 
 variables:
   serviceConnection: 'devops-bicep-ai900-service-connection'
-  resourceGroupLocation: {{ parameters.location }}
+  resourceGroupLocation: ${{ parameters.location }}
   templateFile: 'bicep/main.bicep'
 
 resources:
