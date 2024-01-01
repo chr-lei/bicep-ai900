@@ -34,10 +34,11 @@ variables:
   templateFile: 'bicep/main.bicep'
 
 jobs:
-  - job: Deploy Stack
+  - job: DeployStack
+    displayName: Deploy Stack
     steps:
       - task: AzureCLI@2
-        displayName: Create/Update Stack
+        displayName: Create/Update Stack ${{ parameters.stackName }}
         inputs:
           azureSubscription: $(serviceConnection)
           scriptType: bash
