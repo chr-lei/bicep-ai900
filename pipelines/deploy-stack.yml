@@ -23,21 +23,27 @@ parameters:
   default: eastus
   values:
   - eastus
+- name: stackScope
+  displayName: Stack deployment scope
+  default: subscription
+  values:
+  - subscription
 
 variables:
   serviceConnection: 'devops-bicep-ai900-service-connection'
-  resourceGroupLocation: ${{ parameters.location }}
   templateFile: 'bicep/main.bicep'
 
-steps:
-  - task: AzureCLI@2
-    displayName: Deploy Stack
-    inputs:
-      azureSubscription: $(serviceConnection)
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
-        az stack sub create -f $(templateFile) \
-          --location $(resourceGroupLocation) --name ${{ parameters.stackName }} \
-          --delete-all --deny-settings-mode none \
-          -p nameString=${{ parameters.nameString }} resourceGroupLocation=$(resourceGroupLocation)
+jobs:
+  - job: Deploy Stack
+    - steps:
+      - task: AzureCLI@2
+        displayName: Create/Update Stack
+        inputs:
+          azureSubscription: $(serviceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az stack sub create -f $(templateFile) \
+              --location ${{ parameters.location }} --name ${{ parameters.stackName }} \
+              --delete-all --deny-settings-mode none \
+              -p nameString=${{ parameters.nameString }} resourceGroupLocation=${{ parameters.location }}
